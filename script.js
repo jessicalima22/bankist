@@ -60,3 +60,42 @@ const inputTransferAmount = document.querySelector('.form__input--amount');
 const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
+
+//Show count movements
+const displayMovements = function (movements) {
+  //Removing data from inicial html
+  containerMovements.innerHTML = '';
+
+  //adding function that shows each movimentation in a given object data
+  movements.forEach(function (mov, i) {
+    //verifying if it is a deposit or withdrawal
+    const type = mov > 0 ? 'deposit' : 'withdrawal'; //TODO: what if it is zero?
+    //for each element of the array, creat a HTML element
+    const html = `<div class="movements__row">
+      <div class="movements__type movements__type--${type}">${
+      i + 1
+    } ${type}</div>
+      <div class="movements__date">3 days ago</div>
+      <div class="movements__value">${mov}</div>
+    </div>`;
+    //insert HTML in cointainerMovements:
+    containerMovements.insertAdjacentHTML('afterbegin', html);
+  });
+};
+
+displayMovements(account3.movements);
+
+const createUsernames = function (accs) {
+  accs.forEach(function (acc) {
+    acc.username = acc.owner
+      .toLowerCase()
+      .split(' ')
+      .map(name => name[0])
+      .join('');
+  });
+};
+createUsernames(accounts);
+console.log(accounts);
+
+
+const calcPrintBalance = function(movements)
