@@ -85,6 +85,7 @@ const displayMovements = function (movements) {
 
 displayMovements(account3.movements);
 
+//Creating usernames based on the name of the owners in each object
 const createUsernames = function (accs) {
   accs.forEach(function (acc) {
     acc.username = acc.owner
@@ -97,5 +98,18 @@ const createUsernames = function (accs) {
 createUsernames(accounts);
 console.log(accounts);
 
+//calculating balance value (the sum of all the deposits and withdrawals)
+const calcDisplayBalance = function (movements) {
+  const balance = movements.reduce((acc, mov) => acc + mov, 0);
+  labelBalance.textContent = `${balance} EUR`;
+};
+calcDisplayBalance(account1.movements);
 
-const calcPrintBalance = function(movements)
+//calculating statistics
+calcDisplaySummary = function (movement) {
+  const incomes = movements
+    .filter(mov => mov > 0)
+    .reduce((acc, mov) => acc + mov, 0);
+  labelSumIn.textContent = `${incomes}€`;
+};
+calcDisplaySummary(account1.movements);
