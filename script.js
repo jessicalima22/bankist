@@ -62,12 +62,14 @@ const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
 //Show count movements
-const displayMovements = function (movements) {
+const displayMovements = function (movements, sort = false) {
   //Removing data from inicial html
   containerMovements.innerHTML = '';
 
+  const movs = sort ? movements.slice().sort((a, b) => a - b) : movements;
+
   //adding function that shows each movimentation in a given object data
-  movements.forEach(function (mov, i) {
+  movs.forEach(function (mov, i) {
     //verifying if it is a deposit or withdrawal
     const type = mov > 0 ? 'deposit' : 'withdrawal'; //TODO: what if it is zero?
     //for each element of the array, creat a HTML element
@@ -145,9 +147,9 @@ btnLogin.addEventListener('click', function (e) {
   if (currentAccount?.pin === Number(inputLoginPin.value)) {
     //Display UI and welcome message
     labelWelcome.textContent = `Welcome back, ${
-      currentAccount.owner.slice(' ')[0]
+      currentAccount.owner.split(' ')[0]
     }
-    )}`;
+    `;
     containerApp.style.opacity = 100;
     //clear the input fields
     inputLoginUsername.value = inputLoginPin.value = '';
@@ -175,4 +177,45 @@ btnTransfer.addEventListener('click', function (e) {
     receiverAcc.movements.push(amount);
     updateUI(currentAccount);
   }
+});
+
+btnLoan.addEventListener('click', function (e) {
+  e.preventDefault();
+
+  const amount = Number(inputLoanAmount.value);
+  if (amount > 0 && currentAccount.movements.some(mov => mov >= amount * 0.1)) {
+    //add de movement
+    currentAccount.movements.push(amount);
+    //update UI
+    updateUI(currentAccount);
+  }
+  inputLoanAmount.value = '';
+});
+
+//close account
+btnClose.addEventListener('click', function (e) {
+  e.preventDefault();
+
+  if (
+    inputCloseUsername.value === currentAccount.username &&
+    Number(inputClosePin.value) === currentAccount.pin
+  ) {
+    const index = accounts.findIndex(
+      acc => acc.username === currentAccount.username
+    );
+    //delete account
+    accounts.splice(index, 1);
+
+    //Hide UI
+    containerApp.style.opacity = 0;
+  }
+  inputCloseUsername.value = inputClosePin.value = '';
+});
+
+//sort button
+/*state variable*/ let sorted = false;
+btnSort.addEventListener('click', function (e) {
+  e.preventDefault();
+  displayMovements(currentAccount.movements, !sorted);
+  sorted = !sorted;
 });
