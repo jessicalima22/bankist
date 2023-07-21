@@ -78,7 +78,7 @@ const displayMovements = function (movements, sort = false) {
       i + 1
     } ${type}</div>
       <div class="movements__date">3 days ago</div>
-      <div class="movements__value">${mov} €</div>
+      <div class="movements__value">${mov.toFixed(2)} €</div>
     </div>`;
     //insert HTML in cointainerMovements:
     containerMovements.insertAdjacentHTML('afterbegin', html);
@@ -101,7 +101,7 @@ console.log(accounts);
 //calculating balance value (the sum of all the deposits and withdrawals)
 const calcDisplayBalance = function (acc) {
   acc.balance = acc.movements.reduce((acc, mov) => acc + mov, 0);
-  labelBalance.textContent = `${acc.balance}€`;
+  labelBalance.textContent = `${acc.balance.toFixed(2)}€`;
 };
 
 //calculating statistics
@@ -110,23 +110,24 @@ const calcDisplaySummary = function (acc) {
     .filter(mov => mov > 0)
     .reduce((acc, mov) => acc + mov, 0);
   console.log(incomes);
-  labelSumIn.textContent = `${incomes}€`;
+  labelSumIn.textContent = `${incomes.toFixed(2)}€`;
 
   const out = acc.movements
     .filter(mov => mov < 0)
     .reduce((acc, mov) => acc + mov);
-  labelSumOut.textContent = `${Math.abs(out)}€`;
+  labelSumOut.textContent = `${Math.abs(out).toFixed(2)}€`;
 
   const interest = acc.movements
     .filter(mov => mov > 0)
     .map(deposit => (deposit * acc.interestRate) / 100)
     .filter(int => int >= 1)
     .reduce((acc, int) => acc + int, 0);
-  labelSumInterest.textContent = `${interest}€`;
+  labelSumInterest.textContent = `${interest.toFixed(2)}€`;
 };
 
 let currentAccount;
 
+//update interface
 const updateUI = function (currentAccount) {
   //display movements
   displayMovements(currentAccount.movements);
@@ -144,7 +145,7 @@ btnLogin.addEventListener('click', function (e) {
     acc => acc.username === inputLoginUsername.value
   );
 
-  if (currentAccount?.pin === Number(inputLoginPin.value)) {
+  if (currentAccount?.pin === +inputLoginPin.value) {
     //Display UI and welcome message
     labelWelcome.textContent = `Welcome back, ${
       currentAccount.owner.split(' ')[0]
@@ -159,10 +160,9 @@ btnLogin.addEventListener('click', function (e) {
 });
 
 //passing value to others users
-
 btnTransfer.addEventListener('click', function (e) {
   e.preventDefault();
-  const amount = Number(inputTransferAmount.value);
+  const amount = +inputTransferAmount.value;
   const receiverAcc = accounts.find(
     acc => acc.username === inputTransferTo.value
   );
@@ -179,10 +179,12 @@ btnTransfer.addEventListener('click', function (e) {
   }
 });
 
+//loan
+
 btnLoan.addEventListener('click', function (e) {
   e.preventDefault();
 
-  const amount = Number(inputLoanAmount.value);
+  const amount = Math.floor(inputLoanAmount.value);
   if (amount > 0 && currentAccount.movements.some(mov => mov >= amount * 0.1)) {
     //add de movement
     currentAccount.movements.push(amount);
@@ -198,7 +200,7 @@ btnClose.addEventListener('click', function (e) {
 
   if (
     inputCloseUsername.value === currentAccount.username &&
-    Number(inputClosePin.value) === currentAccount.pin
+    +inputClosePin.value === currentAccount.pin
   ) {
     const index = accounts.findIndex(
       acc => acc.username === currentAccount.username
@@ -218,4 +220,11 @@ btnSort.addEventListener('click', function (e) {
   e.preventDefault();
   displayMovements(currentAccount.movements, !sorted);
   sorted = !sorted;
+});
+
+labelBalance.addEventListener('click', function () {
+  const movementsUI = Array.from(
+    document.querySelectorAll('.movements__value'),
+    el => +el.textContent.replace('€', '')
+  );
 });
