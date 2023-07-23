@@ -261,7 +261,7 @@ btnClose.addEventListener('click', function (e) {
 /*state variable*/ let sorted = false;
 btnSort.addEventListener('click', function (e) {
   e.preventDefault();
-  displayMovements(currentAccount.movement, !sorted);
+  displayMovements(currentAccount, !sorted);
   sorted = !sorted;
 });
 
