@@ -122,14 +122,19 @@ const displayMovements = function (acc, sort = false) {
     const type = mov > 0 ? 'deposit' : 'withdrawal'; //TODO: what if it is zero?
 
     const date = new Date(acc.movementsDates[i]);
-    const displayDate = formatMovementDate(date, acc.locale);
+    const displayDate = formatMovementDate(date, acc.locale).format(mov);
     //for each element of the array, creat a HTML element
+
+    const formarttedMov = new Intl.NumberFormat(acc.locale, {
+      style: 'currency',
+      currency: 'USD',
+    });
     const html = `<div class="movements__row">
       <div class="movements__type movements__type--${type}">${
       i + 1
     } ${type}</div>
       <div class="movements__date">${displayDate}</div>
-      <div class="movements__value">${mov.toFixed(2)} €</div>
+      <div class="movements__value">${formarttedMov}</div>
     </div>`;
     //insert HTML in cointainerMovements:
     containerMovements.insertAdjacentHTML('afterbegin', html);
