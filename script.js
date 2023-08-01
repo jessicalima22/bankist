@@ -21,8 +21,8 @@ const account1 = {
     '2023-07-21T23:36:17.929Z',
     '2023-07-25T10:51:36.790Z',
   ],
-  currency: 'EUR',
-  locale: 'pt-PT', // de-DE
+  currency: 'BRL',
+  locale: 'pt-BR',
 };
 
 const account2 = {
@@ -185,7 +185,7 @@ const calcDisplaySummary = function (acc) {
   labelSumInterest.textContent = formatCur(interest, acc.locale, acc.currency);
 };
 
-let currentAccount;
+let currentAccount, timer;
 
 //update interface
 const updateUI = function (acc) {
@@ -199,17 +199,12 @@ const updateUI = function (acc) {
 
 //Logout timer
 const startLogOutTimer = function () {
-  //set time to 5 minutes
-  let time = 10;
-  //call the timer every second
-  const timer = setInterval(function () {
+  const tick = function () {
     const min = String(Math.trunc(time / 60)).padStart(2, 0);
     const sec = String(time % 60).padStart(2, 0);
     //in each call, print  the remaining time to UI
 
     labelTimer.textContent = `${min}:${sec}`;
-    //decrease 1 sec
-    time--;
 
     //when 0 seconds, stop timer and logout
     if (time === 0) {
@@ -217,7 +212,17 @@ const startLogOutTimer = function () {
       labelWelcome.textContent = `Log in to get started`;
       containerApp.style.opacity = 0;
     }
-  }, 1000);
+
+    //decrease 1 sec
+    time--;
+  };
+  //set time to 5 minutes
+  let time = 300;
+
+  //call the timer every second
+  tick();
+  const timer = setInterval(tick, 1000);
+  return timer;
 };
 
 //login settings
@@ -268,7 +273,9 @@ btnLogin.addEventListener('click', function (e) {
     //clear the input fields
     inputLoginUsername.value = inputLoginPin.value = '';
     inputLoginPin.blur();
-    startLogOutTimer();
+    //avoid double timer at the same time
+    if (timer) clearInterval(timer);
+    timer = startLogOutTimer();
     updateUI(currentAccount);
   }
 });
@@ -295,6 +302,10 @@ btnTransfer.addEventListener('click', function (e) {
     receiverAcc.movementsDates.push(new Date().toISOString());
 
     updateUI(currentAccount);
+
+    //reset timer
+    clearInterval(timer);
+    timer = startLogOutTimer();
   }
 });
 
@@ -314,6 +325,10 @@ btnLoan.addEventListener('click', function (e) {
 
       //update UI
       updateUI(currentAccount);
+
+      //reset timer
+      clearInterval(timer);
+      timer = startLogOutTimer();
     }, 2500);
   }
   inputLoanAmount.value = '';
